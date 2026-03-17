@@ -163,7 +163,7 @@ async def handle_user_join(chat_id: int, user_id: int, userbot):
     # 🔹 TEMP MESSAGE IN GROUP
     msg = await app.send_message(
         chat_id,
-        f"🎤 {mention} <b>joined the VC</b>"
+        f"<emoji id=6037182932370590949>🎧</emoji> {mention} <b>ʜᴧs ᴊσɪηєᴅ ᴛʜє ᴠᴄ ᴧηᴅ ʜɪs / ʜєʀ ᴧᴄᴛɪσηs ᴡɪʟʟ ʙє ησᴛɪᴄєᴅ ..</b>"
     )
     asyncio.create_task(delete_after_delay(msg, 10))
 
@@ -187,7 +187,7 @@ async def handle_user_leave(chat_id: int, user_id: int, userbot):
 
     msg = await app.send_message(
         chat_id,
-        f"👋 {mention} <b>left the VC</b>"
+        f"<emoji id=6037182932370590949>🎧</emoji> {mention} <b> ʜᴧs ʟєғᴛ ᴛʜє ᴠσɪᴄє ᴄʜᴧᴛ</b>"
     )
     asyncio.create_task(delete_after_delay(msg, 10))
 
