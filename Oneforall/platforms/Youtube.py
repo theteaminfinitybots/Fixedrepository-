@@ -188,23 +188,6 @@ class YouTubeAPI:
         else:
             return 0, stderr.decode()
 
-    async def playlist(self, link, limit, user_id, videoid: Union[bool, str] = None):
-        if videoid:
-            link = self.listbase + link
-        if "&" in link:
-            link = link.split("&")[0]
-        playlist = await shell_cmd(
-            f"yt-dlp -i --get-id --flat-playlist --cookies {cookie_txt_file()} --playlist-end {limit} --skip-download {link}"
-        )
-        try:
-            result = playlist.split("\n")
-            for key in result:
-                if key == "":
-                    result.remove(key)
-        except:
-            result = []
-        return result
-
     async def track(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
