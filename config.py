@@ -108,7 +108,8 @@ YOUTUBE_IMG_URL = "https://graph.org/file/7c703f3d157b477bd5879-4463312df2304b77
 SPOTIFY_ARTIST_IMG_URL = "https://graph.org/file/7c703f3d157b477bd5879-4463312df2304b779f.jpg"
 SPOTIFY_ALBUM_IMG_URL = "https://graph.org/file/7c703f3d157b477bd5879-4463312df2304b779f.jpg"
 SPOTIFY_PLAYLIST_IMG_URL = "https://graph.org/file/7c703f3d157b477bd5879-4463312df2304b779f.jpg"
-
+ 
+THUMB_VID_URL = "https://files.catbox.moe/u67qpv.mp4"
 
 def time_to_seconds(time):
     stringt = str(time)
