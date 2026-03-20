@@ -8,8 +8,8 @@ from pyrogram import filters
 load_dotenv()
 
 # Get this value from my.telegram.org/apps
-API_ID = int(getenv("API_ID", "26950458"))
-API_HASH = getenv("API_HASH", "d818b8d530e4a9b209509815ab1b9c7c")
+API_ID = int(getenv("API_ID", "34594672"))
+API_HASH = getenv("API_HASH", "a008e5018b8662e872be5a8670db4840")
 
 # Get your token from @BotFather on Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN","")
@@ -20,16 +20,16 @@ YOUTUBE_API_KEY= getenv("API KEY", "")
 
 # Get your mongo url from cloud.mongodb.com
 MONGO_DB_URI = getenv("MONGO_DB_URI", "mongodb+srv://knight4563:knight4563@cluster0.a5br0se.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME", "Roohi_Queen_Bot")
+MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME", "")
 PRIVATE_BOT_MODE = getenv("PRIVATE_BOT_MODE", None)
 
 DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 100000))
 
 # Chat id of a group for logging bot's activities
-LOGGER_ID = int(getenv("LOGGER_ID", -1002869205475))
+LOGGER_ID = int(getenv("LOGGER_ID", -1003748760283))
 
 # Get this value from @BRANDRD_ROBOT on Telegram by /id
-OWNER_ID = int(getenv("OWNER_ID", "7487670897"))
+OWNER_ID = int(getenv("OWNER_ID", "7651303468"))
 SUDO_USERS = list(map(int, getenv("SUDO_USERS", "7487670897").split()))
 
 ## Fill these variables if you're deploying on heroku.
@@ -40,18 +40,18 @@ HEROKU_API_KEY = getenv("HEROKU_API_KEY")
 
 UPSTREAM_REPO = getenv(
     "UPSTREAM_REPO",
-    "https://github.com/Gxtoxic4563/Roohi",
+    "https://github.com/theteaminfinitybots/Fixedrepository-",
 )
 UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "main")
 GIT_TOKEN = getenv(
     "GIT_TOKEN", None
 )  # Fill this variable if your upstream repository is private
 
-SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/dark_x_knight_musiczz_support/112")
-SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/cuties_logs")
+SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/dark_musictm")
+SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/snowy_hometown")
 
 # Set this to True if you want the assistant to automatically leave chats after an interval
-AUTO_LEAVING_ASSISTANT = bool(getenv("AUTO_LEAVING_ASSISTANT", False))
+AUTO_LEAVING_ASSISTANT = bool(getenv("AUTO_LEAVING_ASSISTANT", True))
 
 # Auto Gcast/Broadcast Handler (True = broadcast on , False = broadcast off During Hosting, Dont Do anything here.)
 AUTO_GCAST = os.getenv("AUTO_GCAST")
