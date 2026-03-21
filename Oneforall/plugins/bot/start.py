@@ -6,7 +6,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
 
 import config
-from config import BANNED_USERS
+from config import BANNED_USERS, START_IMG_URL
 from Oneforall import app
 from Oneforall.misc import _boot_
 from Oneforall.plugins.sudo.sudoers import sudoers_list
@@ -28,7 +28,7 @@ from Oneforall.misc import SUDOERS
 @LanguageStart
 async def start_pm(client, message: Message, _):
     await add_served_user(message.from_user.id)
-    await message.react("❤")
+    await message.react_big("❤")
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
