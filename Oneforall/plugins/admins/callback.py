@@ -37,7 +37,7 @@ from Oneforall.utils.inline import (
     stream_markup_timer2,
 )
 from Oneforall.utils.stream.autoclear import auto_clean
-from Oneforall.utils.thumbnails import get_thumb
+from Oneforall.utils.thumbnails import gen_thumb
 from strings import get_string
 
 checker = {}
@@ -232,7 +232,7 @@ async def del_back_playlist(client, CallbackQuery, _):
             except:
                 return await CallbackQuery.message.reply_text(_["call_6"])
             button = stream_markup2(_, chat_id)
-            img = await get_thumb(videoid)
+            img = await gen_thumb(videoid)
             run = await CallbackQuery.message.reply_photo(
                 photo=img,
                 caption=_["stream_1"].format(
@@ -268,7 +268,7 @@ async def del_back_playlist(client, CallbackQuery, _):
             except:
                 return await mystic.edit_text(_["call_6"])
             button = stream_markup(_, videoid, chat_id)
-            img = await get_thumb(videoid)
+            img = await gen_thumb(videoid)
             run = await CallbackQuery.message.reply_photo(
                 photo=img,
                 caption=_["stream_1"].format(
@@ -343,7 +343,7 @@ async def del_back_playlist(client, CallbackQuery, _):
                 db[chat_id][0]["markup"] = "tg"
             else:
                 button = stream_markup(_, videoid, chat_id)
-                img = await get_thumb(videoid)
+                img = await gen_thumb(videoid)
                 run = await CallbackQuery.message.reply_photo(
                     photo=img,
                     caption=_["stream_1"].format(
