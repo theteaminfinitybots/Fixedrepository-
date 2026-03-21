@@ -94,6 +94,7 @@ def help_pannel(_, START: Union[bool, int] = None):
                     callback_data="help_callback hb15",
                 ),
             ],
+        ]
 def help_back_markup(_):
     upl = InlineKeyboardMarkup(
         [
