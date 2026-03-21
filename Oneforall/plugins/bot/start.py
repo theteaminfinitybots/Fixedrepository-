@@ -230,3 +230,78 @@ async def start_gp(client, message: Message, _):
         reply_markup=InlineKeyboardMarkup(out),
     )
     return await add_served_chat(message.chat.id)
+
+
+@app.on_message(filters.new_chat_members, group=-1)
+async def welcome_handler(client, message: Message):
+    for member in message.new_chat_members:
+        try:
+            language = await get_lang(message.chat.id)
+            _ = get_string(language)
+
+            # BAN CHECK
+            if await is_banned_user(member.id):
+                try:
+                    await message.chat.ban_member(member.id)
+                except:
+                    pass
+                return
+
+            # BOT JOINED
+            if member.id == app.id:
+                if message.chat.type != ChatType.SUPERGROUP:
+                    await message.reply_text(_["start_4"])
+                    return await app.leave_chat(message.chat.id)
+
+                if message.chat.id in await blacklisted_chats():
+                    await message.reply_text(
+                        _["start_5"].format(
+                            app.mention,
+                            f"https://t.me/{app.username}?start=sudolist",
+                            config.SUPPORT_CHAT,
+                        ),
+                        disable_web_page_preview=True,
+                    )
+                    return await app.leave_chat(message.chat.id)
+
+                await message.reply_photo(
+                    photo=config.START_IMG_URL,
+                    caption=_["start_3"].format(
+                        message.from_user.first_name,
+                        app.mention,
+                        message.chat.title,
+                        app.mention,
+                    ),
+                    reply_markup=InlineKeyboardMarkup(start_panel(_)),
+                )
+                await add_served_chat(message.chat.id)
+                await message.stop_propagation()
+                return
+
+            # OWNER WELCOME
+            if member.id == config.OWNER_ID:
+                msg = await message.reply_photo(
+                    photo=config.STYLE_ENTRY_IMG_URL,
+                    caption=f"<blockquote><i><u>❍{member.mention}ᴛʜє ᴄᴏᴅєʀ σғ ᴛʜє ʙᴏᴛ ʜᴧs ᴊσɪηєᴅ ᴛʜє ᴄʜᴧᴛ ..\n⌯ ᴅσ ϻᴧɪηᴛᴧɪη ᴛʜє ᴄʜᴧᴛ σʀ ʙє ʀєᴧᴅʏ ᴛσ ғᴧᴄє ᴛʜє\n 🌷ᴊσɪη ᴛʜє sᴜᴘᴘσʀᴛ ᴄʜᴧᴛ ғσʀ ϻσʀє ɪηғσ ᴧηᴅ <a href='https://t.me/astral_superbans'>sᴜᴘєʀʙᴧη ʟσɢs</a> ғσʀ ᴄʜєᴄᴋɪηɢ sᴜᴘєʀʙᴧηs </u></i></blockquote>",
+                    reply_markup=keyboard,
+                )
+                await asyncio.sleep(20)
+                await msg.delete()
+
+            # SUDO WELCOME
+            if isinstance(SUDOERS, (list, set)):
+                is_sudo = member.id in SUDOERS
+            else:
+                is_sudo = member.id == SUDOERS
+
+            if is_sudo:
+                 msg = await message.reply_photo(
+                    photo=config.STYLE_ENTRY_IMG_URL,
+                    caption=f"<blockquote><i><u>⌯{member.mention} sᴜᴅσ ᴜsєʀ σғ ᴛʜє ʙᴏᴛ ʜᴧs ᴇηᴛєʀєᴅ ᴛʜє ᴄʜᴧᴛ ..\n✦ ᴘʟєᴧsє ᴋєєᴘ ᴛʜє ᴄʜᴧᴛ ᴄʟєᴧη ᴧηᴅ ғσʟʟσᴡ ᴛʜє ʀᴜʟєs\n❍ ϻɪsᴜsє σʀ sᴘᴧϻ ϻᴧʏ ʀєsᴜʟᴛ ɪη ᴧᴄᴛɪση\n🌷 ᴊσɪη ᴛʜє <a href='https://t.me/snowy_hometown'>sᴜᴘᴘσʀᴛ ᴄʜᴧᴛ</a> ғσʀ ϻσʀє ɪηғσ ᴧηᴅ <a href='https://t.me/astral_superbans'>sᴜᴘєʀʙᴧη ʟσɢs</a> ғσʀ ᴄʜєᴄᴋɪηɢ sᴜᴘєʀʙᴧηs</u></i></blockquote>",
+                    reply_markup=keyboard,
+                 )
+                await asyncio.sleep(20)
+                await msg.delete()
+
+        except Exception as e:
+            print(f"[WELCOME ERROR] {e}")
