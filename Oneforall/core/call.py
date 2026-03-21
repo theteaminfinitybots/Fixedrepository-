@@ -30,18 +30,27 @@ from Oneforall.utils.exceptions import AssistantErr
 from Oneforall.utils.formatters import check_duration, seconds_to_min, speed_converter
 from Oneforall.utils.inline.play import stream_markup, stream_markup2
 from Oneforall.utils.stream.autoclear import auto_clean
-from Oneforall.utils.thumbnails import get_thumb
+from Oneforall.utils.thumbnails import gen_thumb
 from strings import get_string
+
+async def delete_old_message(chat_id: int):
+    try:
+        old = db.get(chat_id, [{}])[0].get("mystic")
+        if old:
+            await old.delete()
+    except:
+        pass
+
 
 autoend = {}
 counter = {}
-loop = asyncio.get_event_loop_policy().get_event_loop()
 
 
-async def _clear_(chat_id):
+async def _clear_(chat_id: int):
     db[chat_id] = []
     await remove_active_video_chat(chat_id)
     await remove_active_chat(chat_id)
+
 
 
 class Call(PyTgCalls):
@@ -99,6 +108,7 @@ class Call(PyTgCalls):
 
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
+        await delete_old_message(chat_id)
         await assistant.pause_stream(chat_id)
 
     async def mute_stream(self, chat_id: int):
@@ -120,6 +130,7 @@ class Call(PyTgCalls):
 
     async def stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
+        await delete_old_message(chat_id)
         try:
             await _clear_(chat_id)
             await assistant.leave_group_call(chat_id)
@@ -199,7 +210,7 @@ class Call(PyTgCalls):
             MediaStream(
                 out,
                 audio_parameters=AudioQuality.HIGH,
-                video_parameters=VideoQuality.SD_480p,
+                video_parameters=VideoQuality.SD_360p,
                 ffmpeg_parameters=f"-ss {played} -to {duration}",
             )
             if playing[0]["streamtype"] == "video"
@@ -270,7 +281,7 @@ class Call(PyTgCalls):
             MediaStream(
                 file_path,
                 audio_parameters=AudioQuality.HIGH,
-                video_parameters=VideoQuality.SD_480p,
+                video_parameters=VideoQuality.SD_360p,
                 ffmpeg_parameters=f"-ss {to_seek} -to {duration}",
             )
             if mode == "video"
@@ -307,14 +318,14 @@ class Call(PyTgCalls):
             stream = MediaStream(
                 link,
                 audio_parameters=AudioQuality.HIGH,
-                video_parameters=VideoQuality.SD_480p,
+                video_parameters=VideoQuality.SD_360p,
             )
         else:
             stream = (
                 MediaStream(
                     link,
                     audio_parameters=AudioQuality.HIGH,
-                    video_parameters=VideoQuality.SD_480p,
+                    video_parameters=VideoQuality.SD_360p,
                 )
                 if video
                 else MediaStream(
@@ -394,7 +405,7 @@ class Call(PyTgCalls):
                     stream = MediaStream(
                         link,
                         audio_parameters=AudioQuality.HIGH,
-                        video_parameters=VideoQuality.SD_480p,
+                        video_parameters=VideoQuality.SD_360p,
                     )
                 else:
                     stream = MediaStream(
@@ -409,7 +420,7 @@ class Call(PyTgCalls):
                         original_chat_id,
                         text=_["call_6"],
                     )
-                img = await get_thumb(videoid)
+                img = await gen_thumb(videoid)
                 button = stream_markup2(_, chat_id)
                 run = await app.send_photo(
                     chat_id=original_chat_id,
@@ -441,7 +452,7 @@ class Call(PyTgCalls):
                     stream = MediaStream(
                         file_path,
                         audio_parameters=AudioQuality.HIGH,
-                        video_parameters=VideoQuality.SD_480p,
+                        video_parameters=VideoQuality.SD_360p,
                     )
                 else:
                     stream = MediaStream(
@@ -477,7 +488,7 @@ class Call(PyTgCalls):
                     MediaStream(
                         videoid,
                         audio_parameters=AudioQuality.HIGH,
-                        video_parameters=VideoQuality.SD_480p,
+                        video_parameters=VideoQuality.SD_360p,
                     )
                     if str(streamtype) == "video"
                     else MediaStream(
@@ -507,7 +518,7 @@ class Call(PyTgCalls):
                     stream = MediaStream(
                         queued,
                         audio_parameters=AudioQuality.HIGH,
-                        video_parameters=VideoQuality.SD_480p,
+                        video_parameters=VideoQuality.SD_360p,
                     )
                 else:
                     stream = MediaStream(
