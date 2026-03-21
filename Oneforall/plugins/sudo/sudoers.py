@@ -48,7 +48,7 @@ async def userdel(client, message: Message, _):
 @language
 async def sudoers_list(client, message: Message, _):
     if message.from_user.id not in SUDOERS:
-        return await message.reply_text("💔 <b>ᴏᴡɴᴇʀs:</b>\n1➤ <a href='https://t.me/dark_musictm'>˹ ɪɴꜰɪɴɪᴛʏ ✘ ɴᴇᴛᴡᴏʀᴋ˼ 🎧</a>",
+        return await message.reply_text("💔 <b>ᴏᴡɴᴇʀs:</b>\n1➤ <a href='https://t.me/the_eren_l'> ᴇʀᴇɴ ʏᴇᴀɢᴇʀ </a>",
         disable_web_page_preview=True,
         parse_mode="html")
     text = _["sudo_5"]
