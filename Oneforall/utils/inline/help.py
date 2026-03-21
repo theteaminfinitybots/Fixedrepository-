@@ -94,40 +94,6 @@ def help_pannel(_, START: Union[bool, int] = None):
                     callback_data="help_callback hb15",
                 ),
             ],
-            [
-                InlineKeyboardButton(
-                    text=_["H_B_26"],
-                    callback_data="help_callback hb17",
-                ),
-                InlineKeyboardButton(
-                    text=_["H_B_25"],
-                    callback_data="help_callback hb16",
-                ),
-                InlineKeyboardButton(
-                    "🎮 ғᴜɴ ɢᴀᴍᴇ",
-                    callback_data="help_callback hb21",
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text=_["H_B_27"],
-                    callback_data="help_callback hb18",
-                ),
-                InlineKeyboardButton(
-                    text=_["H_B_28"],
-                    callback_data="help_callback hb19",
-                ),
-                InlineKeyboardButton(
-                    "✨ ғsᴜʙ",
-                    callback_data="help_callback hb20",
-                ),
-            ],
-            mark,
-        ]
-    )
-    return upl
-
-
 def help_back_markup(_):
     upl = InlineKeyboardMarkup(
         [
@@ -136,7 +102,13 @@ def help_back_markup(_):
                     text=_["BACK_BUTTON"],
                     callback_data=f"settings_back_helper",
                 ),
-            ]
+            ],
+            [
+                InlineKeyboardButton(
+                    text="𝗗𝗲𝘃𝗲𝗹𝗼𝗽𝗲𝗿",
+                    url="https://t.me/the_eren_l",
+                ),
+            ],
         ]
     )
     return upl
