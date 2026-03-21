@@ -4,7 +4,7 @@ from typing import Union
 
 from pyrogram.types import InlineKeyboardMarkup
 
-import config import THUMB_VID_URL, YOUTUBE_IMG_URL
+from config import THUMB_VID_URL, YOUTUBE_IMG_URL
 from Oneforall import Carbon, YouTube, app
 from Oneforall.core.call import Hotty
 from Oneforall.misc import db
