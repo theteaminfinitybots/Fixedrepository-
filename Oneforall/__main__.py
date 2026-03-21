@@ -57,7 +57,7 @@ async def init():
 
     try:
         await Hotty.stream_call(
-            "https://graph.org/file/e999c40cb700e7c684b75.mp4"
+            "https://files.catbox.moe/u67qpv.mp4"
         )
     except NoActiveGroupCall:
         LOGGER("Oneforall").error(
