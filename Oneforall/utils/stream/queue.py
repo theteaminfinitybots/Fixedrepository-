@@ -1,9 +1,11 @@
+
+
 import asyncio
 from typing import Union
 
-from config import autoclean, time_to_seconds
 from Oneforall.misc import db
 from Oneforall.utils.formatters import check_duration, seconds_to_min
+from config import autoclean, time_to_seconds
 
 
 async def put_queue(
@@ -23,7 +25,6 @@ async def put_queue(
         duration_in_seconds = time_to_seconds(duration) - 3
     except:
         duration_in_seconds = 0
-
     put = {
         "title": title,
         "dur": duration,
@@ -36,16 +37,15 @@ async def put_queue(
         "seconds": duration_in_seconds,
         "played": 0,
     }
-
     if forceplay:
         check = db.get(chat_id)
         if check:
             check.insert(0, put)
         else:
-            db[chat_id] = [put]
+            db[chat_id] = []
+            db[chat_id].append(put)
     else:
         db[chat_id].append(put)
-
     autoclean.append(file)
 
 
@@ -71,7 +71,6 @@ async def put_queue_index(
             dur = 0
     else:
         dur = 0
-
     put = {
         "title": title,
         "dur": duration,
@@ -83,12 +82,12 @@ async def put_queue_index(
         "seconds": dur,
         "played": 0,
     }
-
     if forceplay:
         check = db.get(chat_id)
         if check:
             check.insert(0, put)
         else:
-            db[chat_id] = [put]
+            db[chat_id] = []
+            db[chat_id].append(put)
     else:
         db[chat_id].append(put)
