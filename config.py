@@ -16,7 +16,7 @@ FORCE_CHANNEL_2 = os.getenv("FORCE_CHANNEL_2", "https://t.me/docker_git_bit")
 
 # Get your token from @BotFather on Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN","")
-
+FAILED = getenv("FAILED", "https://te.legra.ph/file/4c896584b592593c00aa8.jpg")
 # OpenAI Token
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 YOUTUBE_API_KEY= getenv("API KEY", "")
