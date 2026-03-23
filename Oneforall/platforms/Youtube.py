@@ -253,25 +253,7 @@ class YouTubeAPI:
         except Exception as e:
             return 0, f"Video download error: {e}"
 
-    async def playlist(self, link, limit, user_id, videoid: Union[bool, str] = None):
-        if videoid:
-            link = self.listbase + link
-        if "&" in link:
-            link = link.split("&")[0]
-
-        cmd = (
-            f"yt-dlp -i --compat-options no-youtube-unavailable-videos "
-            f'--get-id --flat-playlist --playlist-end {limit} --skip-download "{link}" '
-            f"2>/dev/null"
-        )
-
-        playlist = await shell_cmd(cmd)
-
-        try:
-            result = [key for key in playlist.split("\n") if key]
-        except:
-            result = []
-        return result
+    
 
     async def track(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
