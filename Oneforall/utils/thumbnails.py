@@ -35,7 +35,7 @@ def get_random_color():
     return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255)
 
 
-async def gen_thumb(videoid):  # renamed here
+async def get_thumb(videoid):
     if os.path.isfile(f"cache/{videoid}.png"):
         return f"cache/{videoid}.png"
 
@@ -112,12 +112,10 @@ async def gen_thumb(videoid):  # renamed here
         font = ImageFont.truetype("Oneforall/assets/font2.ttf", 45)
         font2 = ImageFont.truetype("Oneforall/assets/font2.ttf", 70)
         arial = ImageFont.truetype("Oneforall/assets/font2.ttf", 30)
-        name_font = ImageFont.truetype("Oneforall/assets/font.ttf", 30)  # fixed Spy -> Oneforall
-
+        name_font = ImageFont.truetype("Oneforall/assets/font.ttf", 30)
         para = textwrap.wrap(title, width=30)
         j = 0
         draw.text((5, 5), f"˹ ɪɴꜰɪɴɪᴛʏ ✘ ɴᴇᴛᴡᴏʀᴋ˼ 🎧", fill="white", font=name_font)
-
         for line in para:
             if j == 1:
                 j += 1
@@ -139,7 +137,6 @@ async def gen_thumb(videoid):  # renamed here
                     stroke_fill="white",
                     font=font,
                 )
-
         draw.text(
             (20, 675),
             f"{channel} | {views[:23]}",
@@ -158,15 +155,12 @@ async def gen_thumb(videoid):  # renamed here
             (255, 255, 255),
             font=arial,
         )
-
         try:
             os.remove(f"cache/thumb{videoid}.png")
         except:
             pass
-
         background.save(f"cache/{videoid}.png")
         return f"cache/{videoid}.png"
-
     except Exception as e:
         print(e)
         return YOUTUBE_IMG_URL
