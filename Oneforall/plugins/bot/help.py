@@ -5,6 +5,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import BANNED_USERS, SUPPORT_CHAT
 from Oneforall import app
+from Oneforall.misc import SUDOERS
 from Oneforall.utils import help_pannel
 from Oneforall.utils.database import get_lang
 from Oneforall.utils.decorators.language import LanguageStart, languageCB
