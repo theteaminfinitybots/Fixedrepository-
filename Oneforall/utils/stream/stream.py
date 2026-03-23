@@ -7,7 +7,7 @@ from pyrogram.types import InlineKeyboardMarkup
 import config
 from Oneforall import YouTube, app
 from Oneforall.core.call import Hotty
-from Oneforall.utils.thumbnails import gen_thumb
+from Oneforall.utils.thumbnails import get_thumb
 
 # Define a dictionary to track the last message timestamp for each user
 user_last_message_time = {}
