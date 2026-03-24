@@ -296,13 +296,15 @@ try:
         )
         await asyncio.sleep(20)
         await msg.delete()
+        return  # prevents double welcome
 
-    # SUDO WELCOME
+    # SUDO CHECK
     if isinstance(SUDOERS, (list, set)):
         is_sudo = member.id in SUDOERS
     else:
         is_sudo = member.id == SUDOERS
 
+    # SUDO WELCOME
     if is_sudo:
         msg = await message.reply_photo(
             photo=config.STYLE_ENTRY_IMG_URL,
