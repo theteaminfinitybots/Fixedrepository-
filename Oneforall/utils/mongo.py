@@ -17,8 +17,6 @@ db = mongo.Oneforall
 
 coupledb = db.couple
 
-nightdb = mongo.nightmode
-
 afkdb = db.afk
 
 nightmodedb = db.nightmode
