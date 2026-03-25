@@ -3,8 +3,11 @@ import asyncio
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.raw.functions.users import GetFullUser
+
+from config import BANNED_USERS
 from Oneforall import app
 from Oneforall.core.mongo import mongodb
+from Oneforall.utils.decorators import AdminRightsCheck
 
 # ───────── DATABASE ─────────
 
@@ -24,11 +27,6 @@ WARN_LIMIT = 3
 
 # ───────── HELPERS ─────────
 
-async def is_admin(client, chat_id, user_id):
-    member = await client.get_chat_member(chat_id, user_id)
-    return member.status in ("administrator", "creator")
-
-
 async def is_enabled(chat_id):
     data = await status_db.find_one({"chat_id": chat_id})
     return data and data.get("enabled", False)
@@ -42,7 +40,9 @@ async def is_whitelisted(chat_id, user_id):
 
 async def get_bio(user_id):
     try:
-        full = await app.invoke(GetFullUser(id=await app.resolve_peer(user_id)))
+        full = await app.invoke(
+            GetFullUser(id=await app.resolve_peer(user_id))
+        )
         return full.full_user.about or ""
     except:
         return ""
@@ -67,93 +67,85 @@ async def add_warn(chat_id, user_id):
         return count
 
 
-# ───────── COMMANDS (ADMIN ONLY) ─────────
+# ───────── COMMANDS (ADMIN CHECK SAME AS YOUR SYSTEM) ─────────
 
-@app.on_message(filters.command("biolink") & filters.group)
-async def biolink_toggle(client, message: Message):
-    if not await is_admin(client, message.chat.id, message.from_user.id):
-        return await message.reply("❌ Admin only command")
-
+@app.on_message(filters.command(["biolink"]) & filters.group & ~BANNED_USERS)
+@AdminRightsCheck
+async def biolink_toggle(client, message: Message, _, chat_id):
     if len(message.command) < 2:
-        return await message.reply("Usage: /biolink on or off")
+        return await message.reply_text("Usage: /biolink on or off")
 
     action = message.command[1].lower()
 
     if action == "on":
         await status_db.update_one(
-            {"chat_id": message.chat.id},
+            {"chat_id": chat_id},
             {"$set": {"enabled": True}},
             upsert=True
         )
-        await message.reply("🔗 BioLink Protection Enabled")
+        await message.reply_text("🔗 BioLink Protection Enabled")
 
     elif action == "off":
         await status_db.update_one(
-            {"chat_id": message.chat.id},
+            {"chat_id": chat_id},
             {"$set": {"enabled": False}},
             upsert=True
         )
-        await message.reply("❌ BioLink Protection Disabled")
+        await message.reply_text("❌ BioLink Protection Disabled")
 
 
-@app.on_message(filters.command("biofree") & filters.group)
-async def biofree(client, message: Message):
-    if not await is_admin(client, message.chat.id, message.from_user.id):
-        return await message.reply("❌ Admin only")
-
+@app.on_message(filters.command(["biofree"]) & filters.group & ~BANNED_USERS)
+@AdminRightsCheck
+async def biofree(client, message: Message, _, chat_id):
     if message.reply_to_message:
         user_id = message.reply_to_message.from_user.id
     elif len(message.command) > 1:
         user_id = int(message.command[1])
     else:
-        return await message.reply("Reply or give user ID")
+        return await message.reply_text("Reply or give user ID")
 
     await whitelist_db.update_one(
-        {"chat_id": message.chat.id, "user_id": user_id},
+        {"chat_id": chat_id, "user_id": user_id},
         {"$set": {}},
         upsert=True
     )
 
-    await message.reply("✅ User whitelisted")
+    await message.reply_text("✅ User whitelisted")
 
 
-@app.on_message(filters.command("biounfree") & filters.group)
-async def biounfree(client, message: Message):
-    if not await is_admin(client, message.chat.id, message.from_user.id):
-        return await message.reply("❌ Admin only")
-
+@app.on_message(filters.command(["biounfree"]) & filters.group & ~BANNED_USERS)
+@AdminRightsCheck
+async def biounfree(client, message: Message, _, chat_id):
     if message.reply_to_message:
         user_id = message.reply_to_message.from_user.id
     elif len(message.command) > 1:
         user_id = int(message.command[1])
     else:
-        return await message.reply("Reply or give user ID")
+        return await message.reply_text("Reply or give user ID")
 
     await whitelist_db.delete_one(
-        {"chat_id": message.chat.id, "user_id": user_id}
+        {"chat_id": chat_id, "user_id": user_id}
     )
 
-    await message.reply("❌ Removed from whitelist")
+    await message.reply_text("❌ Removed from whitelist")
 
 
-@app.on_message(filters.command("biofreelist") & filters.group)
-async def biofreelist(client, message: Message):
-    if not await is_admin(client, message.chat.id, message.from_user.id):
-        return await message.reply("❌ Admin only")
-
+@app.on_message(filters.command(["biofreelist"]) & filters.group & ~BANNED_USERS)
+@AdminRightsCheck
+async def biofreelist(client, message: Message, _, chat_id):
     users = []
-    async for user in whitelist_db.find({"chat_id": message.chat.id}):
+    async for user in whitelist_db.find({"chat_id": chat_id}):
         users.append(str(user["user_id"]))
 
     if not users:
-        return await message.reply("No whitelisted users.")
+        return await message.reply_text("No whitelisted users.")
 
-    await message.reply("Whitelisted users:\n" + "\n".join(users))
+    await message.reply_text("Whitelisted users:\n" + "\n".join(users))
 
 
-# ───────── MAIN CHECK ─────────
+# ───────── MAIN DETECTOR ─────────
 
-@app.on_message(filters.group & ~filters.service)
+@app.on_message(filters.group & ~filters.service & ~BANNED_USERS)
 async def check_biolink(client, message: Message):
     if not message.from_user:
         return
@@ -161,13 +153,14 @@ async def check_biolink(client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
 
+    # SYSTEM CHECKS
     if not await is_enabled(chat_id):
         return
 
     if await is_whitelisted(chat_id, user_id):
         return
 
-    # GET BIO PROPERLY
+    # FETCH BIO (RATE LIMITED SAFE)
     bio = await get_bio(user_id)
 
     if not bio:
@@ -184,15 +177,19 @@ async def check_biolink(client, message: Message):
     except:
         pass
 
-    warn_msg = await message.reply(
+    warn_msg = await message.reply_text(
         f"⚠️ {message.from_user.mention} has link in bio!\n"
         f"Warnings: {warn_count}/{WARN_LIMIT}"
     )
 
     await asyncio.sleep(5)
-    await warn_msg.delete()
 
-    # OPTIONAL: RESTRICT
+    try:
+        await warn_msg.delete()
+    except:
+        pass
+
+    # 🔒 RESTRICT AFTER LIMIT
     if warn_count >= WARN_LIMIT:
         try:
             await client.restrict_chat_member(
