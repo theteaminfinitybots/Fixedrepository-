@@ -1,0 +1,1 @@
+from Oneforall import app
