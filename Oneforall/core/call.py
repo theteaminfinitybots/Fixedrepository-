@@ -373,16 +373,16 @@ class Call(PyTgCalls):
             if not check:
                 await _clear_(chat_id)
                 try:
-        autoplay = await is_autoplay(chat_id)
-    except:
-        autoplay = False
+                    autoplay = await is_autoplay(chat_id)
+                except:
+                    autoplay = False
 
-    if autoplay:
-        try:
-            await auto_next(chat_id, client)
-            return
-        except Exception as e:
-            print(f"AUTOPLAY ERROR: {e}")
+                if autoplay:
+                    try:
+                        await auto_next(chat_id, client)
+                        return
+                    except Exception as e:
+                        print(f"AUTOPLAY ERROR: {e}")
             
                 return await client.leave_group_call(chat_id)
         except:
