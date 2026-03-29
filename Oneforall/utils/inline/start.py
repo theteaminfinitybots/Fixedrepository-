@@ -26,7 +26,7 @@ def private_panel(_):
             )
         ],
         [
-            InlineKeyboardButton(text="ᴇʀᴇɴ ʏᴇᴀɢᴇʀ", url="https://t.me/the_eren_l", style=ButtonStyle.PRIMARY),
+            InlineKeyboardButton(text="ᴇʀᴇɴ ʏᴇᴀɢᴇʀ", url="https://t.me/toxication_infinity", style=ButtonStyle.PRIMARY),
             InlineKeyboardButton(text=_["S_B_2"], url=config.SUPPORT_CHAT, style=ButtonStyle.PRIMARY),
         ],
         [InlineKeyboardButton(text=_["S_B_4"], callback_data="settings_back_helper")],
