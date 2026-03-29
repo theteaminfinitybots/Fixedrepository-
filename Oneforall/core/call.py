@@ -371,6 +371,15 @@ class Call(PyTgCalls):
             await auto_clean(popped)
             if not check:
                 await _clear_(chat_id)
+
+    # 🔁 AUTOPLAY TRIGGER
+    try:
+        from Oneforall.plugins.play.autoplay import auto_next
+        await auto_next(chat_id, client)
+        return
+    except Exception as e:
+        print(f"AUTOPLAY ERROR: {e}")
+
                 return await client.leave_group_call(chat_id)
         except:
             try:
