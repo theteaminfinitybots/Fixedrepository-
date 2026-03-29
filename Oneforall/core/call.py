@@ -10,6 +10,7 @@ from pytgcalls import PyTgCalls
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
 from pytgcalls.types import AudioQuality, MediaStream, Update, VideoQuality
 from pytgcalls.types.stream import StreamAudioEnded
+from Oneforall.plugins.play.autoplay import auto_next
 
 import config
 from Oneforall import LOGGER, YouTube, app
@@ -372,9 +373,7 @@ class Call(PyTgCalls):
             if not check:
                 await _clear_(chat_id)
 
-    # 🔁 AUTOPLAY TRIGGER
     try:
-        from Oneforall.plugins.play.autoplay import auto_next
         await auto_next(chat_id, client)
         return
     except Exception as e:
