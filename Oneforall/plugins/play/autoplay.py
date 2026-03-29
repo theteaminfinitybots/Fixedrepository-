@@ -1,87 +1,112 @@
 import random
 from pyrogram import filters
-from pyrogram.types import CallbackQuery
+from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
-from config import BANNED_USERS
 from Oneforall import app, YouTube
-from Oneforall.utils.stream.stream import stream
-
-# ───────── AUTOPLAY STORAGE ─────────
-AUTO_PLAY = {}
-
-# Sample songs
-AUTO_SONGS = [
-    "lofi hip hop",
-    "arijit singh songs",
-    "kk hits",
-    "atif aslam songs",
-    "english pop hits",
-    "sad songs hindi",
-]
-
-# ───────── CALLBACK HANDLER ─────────
-@app.on_callback_query(filters.regex("AUTO_PLAY_TOGGLE") & ~BANNED_USERS)
-async def autoplay_toggle(client, CallbackQuery: CallbackQuery):
-    chat_id = CallbackQuery.message.chat.id
-    user_id = CallbackQuery.from_user.id
-
-    if chat_id in AUTO_PLAY:
-        AUTO_PLAY.pop(chat_id)
-        await CallbackQuery.answer("❌ Autoplay Disabled", show_alert=True)
-        return
-
-    AUTO_PLAY[chat_id] = True
-    await CallbackQuery.answer("✅ Autoplay Enabled", show_alert=True)
-
-    # Start autoplay instantly
-    await start_autoplay(CallbackQuery)
+from Oneforall.utils.database import is_autoplay, set_autoplay
+from Oneforall.utils.stream.queue import put_queue
+from Oneforall.misc import db
 
 
-# ───────── START AUTOPLAY ─────────
-async def start_autoplay(CallbackQuery):
-    chat_id = CallbackQuery.message.chat.id
+# ───────── SMALL CAPS FUNCTION ───────── #
 
-    if chat_id not in AUTO_PLAY:
-        return
+def small_caps(text: str) -> str:
+    normal = "abcdefghijklmnopqrstuvwxyz"
+    small = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ"
+    table = str.maketrans(normal, small)
+    return text.lower().translate(table)
 
+
+# ───────── AUTOPLAY NEXT ───────── #
+
+async def auto_next(chat_id: int, client):
     try:
-        query = random.choice(AUTO_SONGS)
-        details, track_id = await YouTube.track(query)
+        autoplay = await is_autoplay(chat_id)
+        if not autoplay:
+            return
 
-        await stream(
-            None,
-            CallbackQuery.message,
-            CallbackQuery.from_user.id,
-            details,
+        if not db.get(chat_id):
+            return
+
+        last = db[chat_id][0]
+        query = last.get("title")
+
+        if not query:
+            return
+
+        # better search query
+        query = f"{query} song"
+
+        results = await YouTube.search(query)
+
+        if not results:
+            return
+
+        data = random.choice(results)
+
+        title = data["title"]
+        vidid = data["id"]
+        duration = data["duration"]
+
+        await put_queue(
             chat_id,
-            "Autoplay",
-            CallbackQuery.message.chat.id,
-            streamtype="youtube",
+            last["chat_id"],
+            f"vid_{vidid}",
+            title,
+            duration,
+            "ᴀᴜᴛᴏᴘʟᴀʏ",
+            vidid,
+            0,
+            "audio",
+        )
+
+        await client.send_message(
+            chat_id=last["chat_id"],
+            text=small_caps(f"autoplaying: {title}"),
         )
 
     except Exception as e:
         print(f"AUTOPLAY ERROR: {e}")
 
 
-# ───────── AUTO NEXT TRACK ─────────
-async def auto_next(chat_id, message):
-    if chat_id not in AUTO_PLAY:
-        return
+# ───────── TOGGLE BUTTON HANDLER ───────── #
+
+@app.on_callback_query(filters.regex("AUTO_TOGGLE"))
+async def autoplay_toggle(_, CallbackQuery: CallbackQuery):
+    chat_id = CallbackQuery.message.chat.id
+
+    current = await is_autoplay(chat_id)
+
+    if current:
+        await set_autoplay(chat_id, False)
+        status = False
+        text = small_caps("autoplay disabled")
+    else:
+        await set_autoplay(chat_id, True)
+        status = True
+        text = small_caps("autoplay enabled")
+
+    # dynamic button
+    button_text = "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏɴ" if status else "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏꜰꜰ"
+
+    buttons = InlineKeyboardMarkup(
+        [[InlineKeyboardButton(button_text, callback_data="AUTO_TOGGLE")]]
+    )
 
     try:
-        query = random.choice(AUTO_SONGS)
-        details, track_id = await YouTube.track(query)
+        await CallbackQuery.message.edit_reply_markup(reply_markup=buttons)
+    except:
+        pass
 
-        await stream(
-            None,
-            message,
-            0,
-            details,
-            chat_id,
-            "Autoplay",
-            message.chat.id,
-            streamtype="youtube",
-        )
+    await CallbackQuery.answer(text, show_alert=True)
 
-    except Exception as e:
-        print(f"AUTOPLAY NEXT ERROR: {e}")
+
+# ───────── BUTTON FUNCTION (USE IN play.py) ───────── #
+
+async def get_autoplay_button(chat_id):
+    status = await is_autoplay(chat_id)
+    text = "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏɴ" if status else "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏꜰꜰ"
+
+    return InlineKeyboardMarkup(
+        [[InlineKeyboardButton(text, callback_data="AUTO_TOGGLE")]]
+    )
