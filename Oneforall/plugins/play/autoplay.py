@@ -8,21 +8,19 @@ from Oneforall.utils.stream.queue import put_queue
 from Oneforall.misc import db
 
 
-# ───────── SMALL CAPS FUNCTION ───────── #
+# ───────── SMALL CAPS ───────── #
 
-def small_caps(text: str) -> str:
+def sc(text: str) -> str:
     normal = "abcdefghijklmnopqrstuvwxyz"
     small = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ"
-    table = str.maketrans(normal, small)
-    return text.lower().translate(table)
+    return text.lower().translate(str.maketrans(normal, small))
 
 
 # ───────── AUTOPLAY NEXT ───────── #
 
 async def auto_next(chat_id: int, client):
     try:
-        autoplay = await is_autoplay(chat_id)
-        if not autoplay:
+        if not await is_autoplay(chat_id):
             return
 
         if not db.get(chat_id):
@@ -34,11 +32,9 @@ async def auto_next(chat_id: int, client):
         if not query:
             return
 
-        # better search query
         query = f"{query} song"
 
         results = await YouTube.search(query)
-
         if not results:
             return
 
@@ -62,14 +58,14 @@ async def auto_next(chat_id: int, client):
 
         await client.send_message(
             chat_id=last["chat_id"],
-            text=small_caps(f"autoplaying: {title}"),
+            text=sc(f"autoplaying: {title}"),
         )
 
     except Exception as e:
         print(f"AUTOPLAY ERROR: {e}")
 
 
-# ───────── TOGGLE BUTTON HANDLER ───────── #
+# ───────── TOGGLE BUTTON ───────── #
 
 @app.on_callback_query(filters.regex("AUTO_TOGGLE"))
 async def autoplay_toggle(_, CallbackQuery: CallbackQuery):
@@ -80,17 +76,17 @@ async def autoplay_toggle(_, CallbackQuery: CallbackQuery):
     if current:
         await set_autoplay(chat_id, False)
         status = False
-        text = small_caps("autoplay disabled")
+        text = sc("autoplay disabled")
     else:
         await set_autoplay(chat_id, True)
         status = True
-        text = small_caps("autoplay enabled")
+        text = sc("autoplay enabled")
 
-    # dynamic button
-    button_text = "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏɴ" if status else "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏꜰꜰ"
+    # update button
+    btn_text = "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏɴ" if status else "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏꜰꜰ"
 
     buttons = InlineKeyboardMarkup(
-        [[InlineKeyboardButton(button_text, callback_data="AUTO_TOGGLE")]]
+        [[InlineKeyboardButton(btn_text, callback_data="AUTO_TOGGLE")]]
     )
 
     try:
@@ -99,14 +95,3 @@ async def autoplay_toggle(_, CallbackQuery: CallbackQuery):
         pass
 
     await CallbackQuery.answer(text, show_alert=True)
-
-
-# ───────── BUTTON FUNCTION (USE IN play.py) ───────── #
-
-async def get_autoplay_button(chat_id):
-    status = await is_autoplay(chat_id)
-    text = "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏɴ" if status else "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏꜰꜰ"
-
-    return InlineKeyboardMarkup(
-        [[InlineKeyboardButton(text, callback_data="AUTO_TOGGLE")]]
-    )
