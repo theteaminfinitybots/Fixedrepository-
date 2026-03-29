@@ -446,9 +446,3 @@ async def stream(
             db[chat_id][0]["markup"] = "tg"
             await mystic.delete()
 
-#chutiya code remove krke new code fixed dal diya
-async def get_thumb(videoid):
-    try:
-        return await get_thumb(videoid)
-    except Exception:
-        return config.YOUTUBE_IMG_URL
