@@ -3,7 +3,7 @@ from pyrogram import filters
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
 from Oneforall import app, YouTube
-from Oneforall.utils.database import get_autoplay, set_autoplay  # ✅ FIXED
+from Oneforall.utils.database import get_autoplay, set_autoplay
 from Oneforall.utils.stream.queue import put_queue
 from Oneforall.misc import db
 
@@ -20,9 +20,11 @@ def sc(text: str) -> str:
 
 async def auto_next(chat_id: int, client):
     try:
-        if not await get_autoplay(chat_id):  # ✅ FIXED
+        # check if autoplay enabled
+        if not await get_autoplay(chat_id):
             return
 
+        # check queue exists
         if not db.get(chat_id):
             return
 
@@ -32,6 +34,7 @@ async def auto_next(chat_id: int, client):
         if not query:
             return
 
+        # improve search
         query = f"{query} song"
 
         results = await YouTube.search(query)
@@ -42,12 +45,20 @@ async def auto_next(chat_id: int, client):
 
         title = data["title"]
         vidid = data["id"]
-        duration = data["duration"]
 
+        # 🔥 FIX: get playable stream link
+        n, link = await YouTube.video(vidid, True)
+
+        if n == 0:
+            return
+
+        duration = data.get("duration", "0:00")
+
+        # 🔥 FIX: use link instead of vid id
         await put_queue(
             chat_id,
             last["chat_id"],
-            f"vid_{vidid}",
+            link,
             title,
             duration,
             "ᴀᴜᴛᴏᴘʟᴀʏ",
@@ -71,7 +82,7 @@ async def auto_next(chat_id: int, client):
 async def autoplay_toggle(_, CallbackQuery: CallbackQuery):
     chat_id = CallbackQuery.message.chat.id
 
-    current = await get_autoplay(chat_id)  # ✅ FIXED
+    current = await get_autoplay(chat_id)
 
     if current:
         await set_autoplay(chat_id, False)
@@ -82,7 +93,7 @@ async def autoplay_toggle(_, CallbackQuery: CallbackQuery):
         status = True
         text = sc("autoplay enabled")
 
-    # update button
+    # dynamic button text
     btn_text = "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏɴ" if status else "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏꜰꜰ"
 
     buttons = InlineKeyboardMarkup(
