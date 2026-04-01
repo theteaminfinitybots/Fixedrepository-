@@ -234,6 +234,9 @@ def stream_markup2(_, chat_id):
             InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
         ],
         [
+            InlineKeyboardButton(text="ᴀᴜᴛᴏᴘʟᴀʏ ⏻", callback_data=f"AUTOPLAY_TOGGLE|{chat_id}")
+        ],
+        [
             InlineKeyboardButton(text=_["CLOSEMENU_BUTTON"], callback_data="close"),
         ],
     ]
