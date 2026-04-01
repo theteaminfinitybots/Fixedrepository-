@@ -836,11 +836,19 @@ async def is_suggestion(chat_id: int) -> bool:
         return False
     return mode
 
-async def set_autoplay(chat_id: int, state: bool):
-    AUTO_PLAY[chat_id] = state
-
 async def get_autoplay(chat_id: int):
-    return AUTO_PLAY.get(chat_id, False)
+    data = await auto_play.find_one({"chat_id": chat_id})
+    if not data:
+        return False
+    return data.get("enabled", False)
+
+
+async def set_autoplay(chat_id: int, state: bool):
+    await auto_play.update_one(
+        {"chat_id": chat_id},
+        {"$set": {"enabled": state}},
+        upsert=True,
+    )
 
 async def suggestion_on(chat_id: int):
     suggestion[chat_id] = True
