@@ -3,7 +3,7 @@ from pyrogram import filters
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
 from Oneforall import app, YouTube
-from Oneforall.utils.database import is_autoplay, set_autoplay
+from Oneforall.utils.database import get_autoplay, set_autoplay  # ✅ FIXED
 from Oneforall.utils.stream.queue import put_queue
 from Oneforall.misc import db
 
@@ -20,7 +20,7 @@ def sc(text: str) -> str:
 
 async def auto_next(chat_id: int, client):
     try:
-        if not await is_autoplay(chat_id):
+        if not await get_autoplay(chat_id):  # ✅ FIXED
             return
 
         if not db.get(chat_id):
@@ -71,7 +71,7 @@ async def auto_next(chat_id: int, client):
 async def autoplay_toggle(_, CallbackQuery: CallbackQuery):
     chat_id = CallbackQuery.message.chat.id
 
-    current = await is_autoplay(chat_id)
+    current = await get_autoplay(chat_id)  # ✅ FIXED
 
     if current:
         await set_autoplay(chat_id, False)
