@@ -4,7 +4,7 @@ from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMa
 
 from Oneforall import app, YouTube
 from Oneforall.utils.database import get_autoplay, set_autoplay
-from Oneforall.utils.stream.queue import put_queue
+from Oneforall.utils.stream.stream import stream
 from Oneforall.misc import db
 
 
@@ -18,7 +18,7 @@ def sc(text: str) -> str:
 
 # ───────── AUTOPLAY NEXT ───────── #
 
-async def auto_next(chat_id: int, client, last):
+async def auto_next(chat_id: int, client, last, _):
     try:
         # check if autoplay enabled
         if not await get_autoplay(chat_id):
@@ -38,33 +38,28 @@ async def auto_next(chat_id: int, client, last):
 
         data = random.choice(results)
 
-        title = data["title"]
         vidid = data["id"]
 
-        # 🔥 FIX: get playable stream link
-        n, link = await YouTube.video(vidid, True)
-
-        if n == 0:
+        try:
+            details, track_id = await YouTube.track(vidid, True)
+        except:
             return
 
-        duration = data.get("duration", "0:00")
+        user_id = last.get("user_id", 0)
+        user_name = "ᴀᴜᴛᴏᴘʟᴀʏ"
+        original_chat_id = last.get("chat_id")
 
-        # 🔥 FIX: use link instead of vid id
-        await put_queue(
+        await stream(
+            _,
+            None,
+            user_id,
+            details,
             chat_id,
-            last["chat_id"],
-            link,
-            title,
-            duration,
-            "ᴀᴜᴛᴏᴘʟᴀʏ",
-            vidid,
-            0,
-            "audio",
-        )
-
-        await client.send_message(
-            chat_id=last["chat_id"],
-            text=sc(f"autoplaying: {title}"),
+            user_name,
+            original_chat_id,
+            video=None,
+            streamtype="youtube",
+            forceplay=False,
         )
 
     except Exception as e:

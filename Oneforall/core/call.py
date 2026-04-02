@@ -380,8 +380,10 @@ class Call(PyTgCalls):
 
                 if autoplay:
                     try:
-                        await auto_next(chat_id, client, popped)
-                        return await self.change_stream(client, chat_id)
+                        language = await get_lang(chat_id)
+                        _ = get_string(language)
+                        await auto_next(chat_id, client, popped, _)
+                        return
                     except Exception as e:
                         print(f"AUTOPLAY ERROR: {e}")
 
