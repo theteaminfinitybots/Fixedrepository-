@@ -360,17 +360,19 @@ class Call(PyTgCalls):
             if users == 1:
                 autoend[chat_id] = datetime.now() + timedelta(minutes=1)
 
-    async def change_stream(self, client, chat_id):
+    async def change_stream(self, client, chat_id, skip=True):
         check = db.get(chat_id)
         popped = None
         loop = await get_loop(chat_id)
         try:
-            if loop == 0:
-                popped = check.pop(0)
-            else:
-                loop = loop - 1
-                await set_loop(chat_id, loop)
-            await auto_clean(popped)
+            if skip:
+                if loop == 0:
+                    popped = check.pop(0)
+                else:
+                    loop = loop - 1
+                    await set_loop(chat_id, loop)
+                await auto_clean(popped)
+
             if not check:
                 await _clear_(chat_id)
                 try:
@@ -382,8 +384,8 @@ class Call(PyTgCalls):
                     try:
                         language = await get_lang(chat_id)
                         _ = get_string(language)
-                        await auto_next(chat_id, client, popped, _)
-                        return
+                        if await auto_next(chat_id, client, popped, _):
+                            return await self.change_stream(client, chat_id, skip=False)
                     except Exception as e:
                         print(f"AUTOPLAY ERROR: {e}")
 
@@ -648,7 +650,7 @@ class Call(PyTgCalls):
         async def stream_end_handler(client, update: Update):
             if not isinstance(update, StreamAudioEnded):
                 return
-            await self.change_stream(client, update.chat_id)
+            await self.change_stream(client, update.chat_id, skip=True)
 
 
 Hotty = Call()

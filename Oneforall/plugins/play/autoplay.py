@@ -2,9 +2,10 @@ import random
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
+import random
 from Oneforall import app, YouTube
 from Oneforall.utils.database import get_autoplay, set_autoplay
-from Oneforall.utils.stream.stream import stream
+from Oneforall.utils.stream.queue import put_queue
 from Oneforall.misc import db
 
 
@@ -32,6 +33,12 @@ async def auto_next(chat_id: int, client, last, _):
         # improve search
         query = f"{query} song"
 
+        # emoji requested by user
+        await client.send_message(
+            chat_id=last["chat_id"],
+            text="🔍",
+        )
+
         results = await YouTube.search(query)
         if not results:
             return
@@ -49,21 +56,23 @@ async def auto_next(chat_id: int, client, last, _):
         user_name = "ᴀᴜᴛᴏᴘʟᴀʏ"
         original_chat_id = last.get("chat_id")
 
-        await stream(
-            _,
-            None,
-            user_id,
-            details,
+        await put_queue(
             chat_id,
-            user_name,
             original_chat_id,
-            video=None,
-            streamtype="youtube",
-            forceplay=False,
+            f"vid_{vidid}",
+            details["title"],
+            details["duration_min"],
+            user_name,
+            vidid,
+            user_id,
+            "audio",
         )
+
+        return True
 
     except Exception as e:
         print(f"AUTOPLAY ERROR: {e}")
+        return False
 
 
 # ───────── TOGGLE BUTTON ───────── #
