@@ -9,7 +9,7 @@ from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
 from pytgcalls.types import AudioQuality, MediaStream, Update, VideoQuality
-from pytgcalls.types.stream import StreamAudioEnded
+from pytgcalls.types import StreamEnded
 from Oneforall.plugins.play.autoplay import auto_next
 
 import config
@@ -220,7 +220,7 @@ class Call(PyTgCalls):
                 out,
                 audio_parameters=AudioQuality.HIGH,
                 ffmpeg_parameters=f"-ss {played} -to {duration}",
-                video_flags=MediaStream.IGNORE,
+                video_flags=MediaStream.Flags.IGNORE,
             )
         )
         if str(db[chat_id][0]["file"]) == str(file_path):
@@ -270,7 +270,7 @@ class Call(PyTgCalls):
             stream = MediaStream(
                 link,
                 audio_parameters=AudioQuality.HIGH,
-                video_flags=MediaStream.IGNORE,
+                video_flags=MediaStream.Flags.IGNORE,
             )
         await assistant.play(
             chat_id,
@@ -291,21 +291,21 @@ class Call(PyTgCalls):
                 file_path,
                 audio_parameters=AudioQuality.HIGH,
                 ffmpeg_parameters=f"-ss {to_seek} -to {duration}",
-                video_flags=MediaStream.IGNORE,
+                video_flags=MediaStream.Flags.IGNORE,
             )
         )
         await assistant.play(chat_id, stream)
 
     async def stream_call(self, link):
         assistant = await group_assistant(self, config.LOGGER_ID)
-        await assistant.join_call(
+        await assistant.play(
             config.LOGGER_ID,
             MediaStream(link),
         )
         await asyncio.sleep(0.2)
         await assistant.leave_call(config.LOGGER_ID)
 
-    async def join_call(
+    async def play(
         self,
         chat_id: int,
         original_chat_id: int,
@@ -333,11 +333,11 @@ class Call(PyTgCalls):
                 else MediaStream(
                     link,
                     audio_parameters=AudioQuality.HIGH,
-                    video_flags=MediaStream.IGNORE,
+                    video_flags=MediaStream.Flags.IGNORE,
                 )
             )
         try:
-            await assistant.join_call(
+            await assistant.play(
                 chat_id,
                 stream,
             )
@@ -429,7 +429,7 @@ class Call(PyTgCalls):
                     stream = MediaStream(
                         link,
                         audio_parameters=AudioQuality.HIGH,
-                        video_flags=MediaStream.IGNORE,
+                        video_flags=MediaStream.Flags.IGNORE,
                     )
                 try:
                     await client.play(chat_id, stream)
@@ -477,7 +477,7 @@ class Call(PyTgCalls):
                     stream = MediaStream(
                         file_path,
                         audio_parameters=AudioQuality.HIGH,
-                        video_flags=MediaStream.IGNORE,
+                        video_flags=MediaStream.Flags.IGNORE,
                     )
                 try:
                     await client.play(chat_id, stream)
@@ -514,7 +514,7 @@ class Call(PyTgCalls):
                     else MediaStream(
                         videoid,
                         audio_parameters=AudioQuality.HIGH,
-                        video_flags=MediaStream.IGNORE,
+                        video_flags=MediaStream.Flags.IGNORE,
                     )
                 )
                 try:
@@ -545,7 +545,7 @@ class Call(PyTgCalls):
                     stream = MediaStream(
                         queued,
                         audio_parameters=AudioQuality.HIGH,
-                        video_flags=MediaStream.IGNORE,
+                        video_flags=MediaStream.Flags.IGNORE,
                     )
                 try:
                     await client.play(chat_id, stream)
@@ -654,7 +654,7 @@ class Call(PyTgCalls):
         @self.four.on_stream_end()
         @self.five.on_stream_end()
         async def stream_end_handler(client, update: Update):
-            if not isinstance(update, StreamAudioEnded):
+            if not isinstance(update, StreamEnded):
                 return
             await self.change_stream(client, update.chat_id, skip=True)
 
