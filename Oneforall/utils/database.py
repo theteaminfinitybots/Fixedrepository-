@@ -50,6 +50,7 @@ privatechats = {}
 cleanmode = []
 suggestion = {}
 mute = {}
+biolink = {}
 audio = {}
 video = {}
 
@@ -849,6 +850,32 @@ async def set_autoplay(chat_id: int, state: bool):
         {"$set": {"enabled": state}},
         upsert=True,
     )
+
+
+async def is_biolink(chat_id: int) -> bool:
+    mode = biolink.get(chat_id)
+    if not mode:
+        user = await onoffdb.find_one({"chat_id": chat_id, "type": "biolink"})
+        if not user:
+            biolink[chat_id] = False
+            return False
+        biolink[chat_id] = True
+        return True
+    return mode
+
+
+async def biolink_on(chat_id: int):
+    biolink[chat_id] = True
+    user = await onoffdb.find_one({"chat_id": chat_id, "type": "biolink"})
+    if not user:
+        return await onoffdb.insert_one({"chat_id": chat_id, "type": "biolink"})
+
+
+async def biolink_off(chat_id: int):
+    biolink[chat_id] = False
+    user = await onoffdb.find_one({"chat_id": chat_id, "type": "biolink"})
+    if user:
+        return await onoffdb.delete_one({"chat_id": chat_id, "type": "biolink"})
 
 async def suggestion_on(chat_id: int):
     suggestion[chat_id] = True

@@ -30,7 +30,7 @@ from Oneforall.utils.database import (
 )
 from Oneforall.utils.exceptions import AssistantErr
 from Oneforall.utils.formatters import check_duration, seconds_to_min, speed_converter
-from Oneforall.utils.inline.play import stream_markup, stream_markup2
+from Oneforall.utils.inline.play import stream_markup, stream_markup2, stream_markup_timer, stream_markup_timer2
 from Oneforall.utils.stream.autoclear import auto_clean
 from Oneforall.utils.thumbnails import get_thumb
 from strings import get_string
@@ -224,7 +224,7 @@ class Call(PyTgCalls):
             )
         )
         if str(db[chat_id][0]["file"]) == str(file_path):
-            await assistant.change_stream(chat_id, stream)
+            await assistant.play(chat_id, stream)
         else:
             raise AssistantErr("Umm")
         if str(db[chat_id][0]["file"]) == str(file_path):
@@ -272,7 +272,7 @@ class Call(PyTgCalls):
                 audio_parameters=AudioQuality.HIGH,
                 video_flags=MediaStream.IGNORE,
             )
-        await assistant.change_stream(
+        await assistant.play(
             chat_id,
             stream,
         )
@@ -294,7 +294,7 @@ class Call(PyTgCalls):
                 video_flags=MediaStream.IGNORE,
             )
         )
-        await assistant.change_stream(chat_id, stream)
+        await assistant.play(chat_id, stream)
 
     async def stream_call(self, link):
         assistant = await group_assistant(self, config.LOGGER_ID)
@@ -432,14 +432,15 @@ class Call(PyTgCalls):
                         video_flags=MediaStream.IGNORE,
                     )
                 try:
-                    await client.change_stream(chat_id, stream)
+                    await client.play(chat_id, stream)
                 except Exception:
                     return await app.send_message(
                         original_chat_id,
                         text=_["call_6"],
                     )
                 img = await get_thumb(videoid)
-                button = stream_markup2(_, chat_id)
+                autoplay = await get_autoplay(chat_id)
+                button = stream_markup2(_, chat_id, autoplay)
                 run = await app.send_photo(
                     chat_id=original_chat_id,
                     photo=img,
@@ -479,14 +480,15 @@ class Call(PyTgCalls):
                         video_flags=MediaStream.IGNORE,
                     )
                 try:
-                    await client.change_stream(chat_id, stream)
+                    await client.play(chat_id, stream)
                 except:
                     return await app.send_message(
                         original_chat_id,
                         text=_["call_6"],
                     )
                 img = await get_thumb(videoid)
-                button = stream_markup(_, videoid, chat_id)
+                autoplay = await get_autoplay(chat_id)
+                button = stream_markup(_, videoid, chat_id, autoplay)
                 await mystic.delete()
                 run = await app.send_photo(
                     chat_id=original_chat_id,
@@ -516,13 +518,14 @@ class Call(PyTgCalls):
                     )
                 )
                 try:
-                    await client.change_stream(chat_id, stream)
+                    await client.play(chat_id, stream)
                 except:
                     return await app.send_message(
                         original_chat_id,
                         text=_["call_6"],
                     )
-                button = stream_markup2(_, chat_id)
+                autoplay = await get_autoplay(chat_id)
+                button = stream_markup2(_, chat_id, autoplay)
                 run = await app.send_photo(
                     chat_id=original_chat_id,
                     photo=config.STREAM_IMG_URL,
@@ -545,14 +548,15 @@ class Call(PyTgCalls):
                         video_flags=MediaStream.IGNORE,
                     )
                 try:
-                    await client.change_stream(chat_id, stream)
+                    await client.play(chat_id, stream)
                 except:
                     return await app.send_message(
                         original_chat_id,
                         text=_["call_6"],
                     )
                 if videoid == "telegram":
-                    button = stream_markup2(_, chat_id)
+                    autoplay = await get_autoplay(chat_id)
+                    button = stream_markup2(_, chat_id, autoplay)
                     run = await app.send_photo(
                         chat_id=original_chat_id,
                         photo=(
@@ -568,7 +572,8 @@ class Call(PyTgCalls):
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "tg"
                 elif videoid == "soundcloud":
-                    button = stream_markup2(_, chat_id)
+                    autoplay = await get_autoplay(chat_id)
+                    button = stream_markup2(_, chat_id, autoplay)
                     run = await app.send_photo(
                         chat_id=original_chat_id,
                         photo=config.SOUNCLOUD_IMG_URL,
@@ -581,7 +586,8 @@ class Call(PyTgCalls):
                     db[chat_id][0]["markup"] = "tg"
                 else:
                     img = await get_thumb(videoid)
-                    button = stream_markup(_, videoid, chat_id)
+                    autoplay = await get_autoplay(chat_id)
+                    button = stream_markup(_, videoid, chat_id, autoplay)
                     run = await app.send_photo(
                         chat_id=original_chat_id,
                         photo=img,

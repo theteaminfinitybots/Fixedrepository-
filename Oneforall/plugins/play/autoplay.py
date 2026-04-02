@@ -1,7 +1,6 @@
 import random
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
-
 from Oneforall import app, YouTube
 from Oneforall.utils.database import get_autoplay, set_autoplay
 from Oneforall.utils.stream.queue import put_queue
@@ -67,6 +66,11 @@ async def auto_next(chat_id: int, client, last, _):
             "audio",
         )
 
+        await client.send_message(
+            chat_id=last["chat_id"],
+            text="autoplayinh",
+        )
+
         return True
 
     except Exception as e:
@@ -76,7 +80,7 @@ async def auto_next(chat_id: int, client, last, _):
 
 # ───────── TOGGLE BUTTON ───────── #
 
-@app.on_callback_query(filters.regex("AUTO_TOGGLE"))
+@app.on_callback_query(filters.regex("AUTOPLAY_TOGGLE"))
 async def autoplay_toggle(_, CallbackQuery: CallbackQuery):
     chat_id = CallbackQuery.message.chat.id
 
@@ -95,7 +99,7 @@ async def autoplay_toggle(_, CallbackQuery: CallbackQuery):
     btn_text = "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏɴ" if status else "🔁 ᴀᴜᴛᴏᴘʟᴀʏ: ᴏꜰꜰ"
 
     buttons = InlineKeyboardMarkup(
-        [[InlineKeyboardButton(btn_text, callback_data="AUTO_TOGGLE")]]
+        [[InlineKeyboardButton(btn_text, callback_data="AUTOPLAY_TOGGLE")]]
     )
 
     try:

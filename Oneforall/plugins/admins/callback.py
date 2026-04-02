@@ -18,6 +18,7 @@ from Oneforall.core.call import Hotty
 from Oneforall.misc import SUDOERS, db
 from Oneforall.utils.database import (
     get_active_chats,
+    get_autoplay,
     get_lang,
     get_upvote_count,
     is_active_chat,
@@ -231,7 +232,8 @@ async def del_back_playlist(client, CallbackQuery, _):
                 await Hotty.skip_stream(chat_id, link, video=status, image=image)
             except:
                 return await CallbackQuery.message.reply_text(_["call_6"])
-            button = stream_markup2(_, chat_id)
+            autoplay = await get_autoplay(chat_id)
+            button = stream_markup2(_, chat_id, autoplay)
             img = await get_thumb(videoid)
             run = await CallbackQuery.message.reply_photo(
                 photo=img,
@@ -267,7 +269,8 @@ async def del_back_playlist(client, CallbackQuery, _):
                 await Hotty.skip_stream(chat_id, file_path, video=status, image=image)
             except:
                 return await mystic.edit_text(_["call_6"])
-            button = stream_markup(_, videoid, chat_id)
+            autoplay = await get_autoplay(chat_id)
+            button = stream_markup(_, videoid, chat_id, autoplay)
             img = await get_thumb(videoid)
             run = await CallbackQuery.message.reply_photo(
                 photo=img,
@@ -288,7 +291,8 @@ async def del_back_playlist(client, CallbackQuery, _):
                 await Hotty.skip_stream(chat_id, videoid, video=status)
             except:
                 return await CallbackQuery.message.reply_text(_["call_6"])
-            button = stream_markup2(_, chat_id)
+            autoplay = await get_autoplay(chat_id)
+            button = stream_markup2(_, chat_id, autoplay)
             run = await CallbackQuery.message.reply_photo(
                 photo=STREAM_IMG_URL,
                 caption=_["stream_2"].format(user),
@@ -312,7 +316,8 @@ async def del_back_playlist(client, CallbackQuery, _):
             except:
                 return await CallbackQuery.message.reply_text(_["call_6"])
             if videoid == "telegram":
-                button = stream_markup2(_, chat_id)
+                autoplay = await get_autoplay(chat_id)
+                button = stream_markup2(_, chat_id, autoplay)
                 run = await CallbackQuery.message.reply_photo(
                     photo=(
                         TELEGRAM_AUDIO_URL
@@ -327,7 +332,8 @@ async def del_back_playlist(client, CallbackQuery, _):
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
             elif videoid == "soundcloud":
-                button = stream_markup2(_, chat_id)
+                autoplay = await get_autoplay(chat_id)
+                button = stream_markup2(_, chat_id, autoplay)
                 run = await CallbackQuery.message.reply_photo(
                     photo=(
                         SOUNCLOUD_IMG_URL
@@ -342,7 +348,8 @@ async def del_back_playlist(client, CallbackQuery, _):
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
             else:
-                button = stream_markup(_, videoid, chat_id)
+                autoplay = await get_autoplay(chat_id)
+                button = stream_markup(_, videoid, chat_id, autoplay)
                 img = await get_thumb(videoid)
                 run = await CallbackQuery.message.reply_photo(
                     photo=img,
@@ -420,6 +427,7 @@ async def markup_timer():
                 except:
                     _ = get_string("en")
                 try:
+                    autoplay = await get_autoplay(chat_id)
                     buttons = (
                         stream_markup_timer(
                             _,
@@ -427,6 +435,7 @@ async def markup_timer():
                             chat_id,
                             seconds_to_min(playing[0]["played"]),
                             playing[0]["dur"],
+                            autoplay,
                         )
                         if markup == "stream"
                         else stream_markup_timer2(
