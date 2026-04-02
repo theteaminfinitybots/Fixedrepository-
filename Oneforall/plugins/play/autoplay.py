@@ -18,17 +18,12 @@ def sc(text: str) -> str:
 
 # ───────── AUTOPLAY NEXT ───────── #
 
-async def auto_next(chat_id: int, client):
+async def auto_next(chat_id: int, client, last):
     try:
         # check if autoplay enabled
         if not await get_autoplay(chat_id):
             return
 
-        # check queue exists
-        if not db.get(chat_id):
-            return
-
-        last = db[chat_id][0]
         query = last.get("title")
 
         if not query:

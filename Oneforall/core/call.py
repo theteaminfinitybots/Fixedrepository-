@@ -18,6 +18,7 @@ from Oneforall.misc import db
 from Oneforall.utils.database import (
     add_active_chat,
     add_active_video_chat,
+    get_autoplay,
     get_lang,
     get_loop,
     group_assistant,
@@ -373,17 +374,17 @@ class Call(PyTgCalls):
             if not check:
                 await _clear_(chat_id)
                 try:
-                    autoplay = await is_autoplay(chat_id)
+                    autoplay = await get_autoplay(chat_id)
                 except:
                     autoplay = False
 
                 if autoplay:
                     try:
-                        await auto_next(chat_id, client)
-                        return
+                        await auto_next(chat_id, client, popped)
+                        return await self.change_stream(client, chat_id)
                     except Exception as e:
                         print(f"AUTOPLAY ERROR: {e}")
-            
+
                 return await client.leave_group_call(chat_id)
         except:
             try:

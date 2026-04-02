@@ -316,6 +316,10 @@ class YouTubeAPI:
         thumbnail = result[query_type]["thumbnails"][0]["url"].split("?")[0]
         return title, duration_min, thumbnail, vidid
 
+    async def search(self, query: str, limit: int = 10):
+        results = VideosSearch(query, limit=limit)
+        return (await results.next())["result"]
+
     async def download(
         self,
         link: str,
