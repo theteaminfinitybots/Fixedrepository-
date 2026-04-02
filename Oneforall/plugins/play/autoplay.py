@@ -2,7 +2,6 @@ import random
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
-import random
 from Oneforall import app, YouTube
 from Oneforall.utils.database import get_autoplay, set_autoplay
 from Oneforall.utils.stream.queue import put_queue
