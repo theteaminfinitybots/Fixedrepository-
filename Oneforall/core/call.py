@@ -9,7 +9,7 @@ from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
 from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
 from pytgcalls.types import AudioQuality, MediaStream, Update, VideoQuality
-from pytgcalls.types import StreamEnded
+from pytgcalls.types import StreamEnded, ChatUpdate
 from Oneforall.plugins.play.autoplay import auto_next
 
 import config
@@ -630,33 +630,21 @@ class Call(PyTgCalls):
             await self.five.start()
 
     async def decorators(self):
-        @self.one.on_kicked()
-        @self.two.on_kicked()
-        @self.three.on_kicked()
-        @self.four.on_kicked()
-        @self.five.on_kicked()
-        @self.one.on_closed_voice_chat()
-        @self.two.on_closed_voice_chat()
-        @self.three.on_closed_voice_chat()
-        @self.four.on_closed_voice_chat()
-        @self.five.on_closed_voice_chat()
-        @self.one.on_left()
-        @self.two.on_left()
-        @self.three.on_left()
-        @self.four.on_left()
-        @self.five.on_left()
-        async def stream_services_handler(_, chat_id: int):
-            await self.stop_stream(chat_id)
-
-        @self.one.on_stream_end()
-        @self.two.on_stream_end()
-        @self.three.on_stream_end()
-        @self.four.on_stream_end()
-        @self.five.on_stream_end()
-        async def stream_end_handler(client, update: Update):
-            if not isinstance(update, StreamEnded):
-                return
-            await self.change_stream(client, update.chat_id, skip=True)
+        @self.one.on_update()
+        @self.two.on_update()
+        @self.three.on_update()
+        @self.four.on_update()
+        @self.five.on_update()
+        async def stream_update_handler(client, update: Update):
+            if isinstance(update, StreamEnded):
+                await self.change_stream(client, update.chat_id, skip=True)
+            elif isinstance(update, ChatUpdate):
+                if update.status in [
+                    ChatUpdate.Status.KICKED,
+                    ChatUpdate.Status.LEFT_GROUP,
+                    ChatUpdate.Status.CLOSED_VOICE_CHAT,
+                ]:
+                    await self.stop_stream(update.chat_id)
 
 
 Hotty = Call()
