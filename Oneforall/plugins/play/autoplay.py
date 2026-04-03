@@ -17,7 +17,7 @@ def sc(text: str) -> str:
 
 # ───────── AUTOPLAY NEXT ───────── #
 
-async def auto_next(chat_id: int, client, last, _):
+async def auto_next(chat_id: int, last, _):
     try:
         # check if autoplay enabled
         if not await get_autoplay(chat_id):
@@ -32,7 +32,7 @@ async def auto_next(chat_id: int, client, last, _):
         query = f"{query} song"
 
         # emoji requested by user
-        await client.send_message(
+        await app.send_message(
             chat_id=last["chat_id"],
             text="🔍",
         )
@@ -66,7 +66,7 @@ async def auto_next(chat_id: int, client, last, _):
             "audio",
         )
 
-        await client.send_message(
+        await app.send_message(
             chat_id=last["chat_id"],
             text="autoplayinh",
         )
