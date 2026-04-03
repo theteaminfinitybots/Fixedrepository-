@@ -36,13 +36,23 @@ async def biolink_protect_handler(client, message: Message):
     if not message.from_user:
         return
 
-    user = await client.get_users(message.from_user.id)
-    bio = user.bio
+    try:
+        user = await client.get_chat_member(message.chat.id, message.from_user.id)
+        if user.status in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR]:
+            return
+    except:
+        pass
 
-    if bio:
-        # Check for links or usernames in bio
-        if re.search(r"(https?://|www\.|t\.me/|@\w+)", bio):
-            try:
-                await message.delete()
-            except:
-                pass
+    try:
+        user_info = await client.get_users(message.from_user.id)
+        bio = user_info.bio
+
+        if bio:
+            # Check for links or usernames in bio
+            if re.search(r"(https?://|www\.|t\.me/|@\w+)", bio, re.IGNORECASE):
+                try:
+                    await message.delete()
+                except:
+                    pass
+    except:
+        pass

@@ -101,7 +101,7 @@ async def stream(
                     )
                 except:
                     await mystic.edit_text(_["play_3"])
-                await Hotty.join_call(
+                await Hotty.play(
                     chat_id,
                     original_chat_id,
                     file_path,
@@ -193,7 +193,7 @@ async def stream(
         else:
             if not forceplay:
                 db[chat_id] = []
-            await Hotty.join_call(
+            await Hotty.play(
                 chat_id,
                 original_chat_id,
                 file_path,
@@ -255,7 +255,7 @@ async def stream(
         else:
             if not forceplay:
                 db[chat_id] = []
-            await Hotty.join_call(chat_id, original_chat_id, file_path, video=None)
+            await Hotty.play(chat_id, original_chat_id, file_path, video=None)
             await put_queue(
                 chat_id,
                 original_chat_id,
@@ -310,7 +310,7 @@ async def stream(
         else:
             if not forceplay:
                 db[chat_id] = []
-            await Hotty.join_call(chat_id, original_chat_id, file_path, video=status)
+            await Hotty.play(chat_id, original_chat_id, file_path, video=status)
             await put_queue(
                 chat_id,
                 original_chat_id,
@@ -367,7 +367,7 @@ async def stream(
             n, file_path = await YouTube.video(link)
             if n == 0:
                 raise AssistantErr(_["str_3"])
-            await Hotty.join_call(
+            await Hotty.play(
                 chat_id,
                 original_chat_id,
                 file_path,
@@ -428,7 +428,7 @@ async def stream(
         else:
             if not forceplay:
                 db[chat_id] = []
-            await Hotty.join_call(
+            await Hotty.play(
                 chat_id,
                 original_chat_id,
                 link,
